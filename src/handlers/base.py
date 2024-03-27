@@ -15,3 +15,14 @@ class Handler:
             return wrapper
         return decorator
 
+
+    def button(self, data):
+        def decorator(func):
+            def wrapper(update: Update) -> str | None:
+                if update.callback_query and update.callback_query.data and update.callback_query.data == data:
+                    return func(update.callback_query)
+                return
+            self.funcs.append(wrapper)
+            return wrapper
+        return decorator
+
