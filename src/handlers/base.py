@@ -7,11 +7,10 @@ class Handler:
 
     def command(self, command):
         def decorator(func):
-            def wrapper(update: Update) -> bool:
+            def wrapper(update: Update) -> str | None:
                 if update.message and update.message.text and update.message.text.startswith(command):
-                    func(update.message)
-                    return True
-                return False
+                    return func(update.message)
+                return
             self.funcs.append(wrapper)
             return wrapper
         return decorator

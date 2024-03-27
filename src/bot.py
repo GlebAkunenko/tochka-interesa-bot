@@ -22,7 +22,9 @@ handlers = [] + moderator.funcs
 @app.post("/send_message")
 def update_handler(update: Update):
     for handler in handlers:
-        if handler(update):
+        answer = handler(update)
+        if answer:
+            bot.send_message(update.message.from_user.id, answer)
             return
     if update.message:
         bot.send_message(update.message.from_user.id, "Неизвестная команда")
