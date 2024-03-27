@@ -17,7 +17,7 @@ handler = Handler()
 @handler.command("/subscribe")
 def subscribe(message: Message):
     user = message.from_user.id
-    if len(Moderator.select(ids=[user])) > 0:
+    if Moderator.select(ids=[user]):
         return "Ты уже модератор"
     user = message.from_user
     name = f"{user.first_name if user.first_name else ''} {user.last_name if user.last_name else ''}"
@@ -34,7 +34,7 @@ def subscribe(message: Message):
 @handler.command("/unsubscribe")
 def unsubscribe(message: Message):
     user = message.from_user.id
-    if len(Moderator.select(ids=[user])) == 0:
+    if not Moderator.select(ids=[user]):
         return "Ты и так не модератор"
     Moderator.delete(ids=user)
     return "Теперь ты не модератор"
