@@ -1,10 +1,12 @@
 from fastapi import FastAPI
-from pyteledantic.models import Bot, Update
+from pyteledantic.models import Update, MessageToSend
 
 import pyteledantic.methods as tg
 import src.config as config
 
 from src.handlers.base import handlers
+from src.utils import Bot
+
 
 app = FastAPI(
     title="Telegram Bot (public)",
@@ -12,7 +14,7 @@ app = FastAPI(
     A public server for processing requests from the WWW via webhooks
     """
 )
-bot = Bot(token=config.token)
+bot = Bot(config.token)
 
 
 @app.post("/send_message")
@@ -20,6 +22,9 @@ def update_handler(update: Update):
     for handler in handlers:
         if handler.is_approach(update):
             handler.func(update)
+            break
+    if update.message:
+        bot.send_message(update.message.from_user.id, "Неизвестная команда")
 
 
 @app.get("/info")
