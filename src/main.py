@@ -5,6 +5,8 @@ import pyteledantic.methods as tg
 import src.config as config
 
 app = FastAPI()
+bot = Bot(token=config.token)
+
 
 @app.post("/send_message")
 def update_handler(update: Update):
@@ -12,7 +14,16 @@ def update_handler(update: Update):
     return "OK"
 
 
-bot = Bot(token="5675141206:AAHyMJbEY8GXLlq0r0-V6yfjzCeFtx4BgW4")
+@app.get("/info")
+def get_info():
+    return tg.get_webhook_info(bot)
 
-tg.set_webhook(bot, "/send_message")
 
+@app.on_event("startup")
+def on_start():
+    tg.set_webhook(bot, config.webhook_url, config.ssl_certfile)
+
+
+@app.on_event("shutdown")
+def on_stop():
+    tg.delete_webhook(bot)
