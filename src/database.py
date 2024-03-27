@@ -1,13 +1,10 @@
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from mysql.connector import connect
-from redis_cache import RedisCache
-from redis import Redis
 
 from src.model import Moderator
 
 import src.config as config
-
 
 
 def create_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
@@ -19,14 +16,7 @@ def create_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
     )
 
 
-cache = RedisCache(
-    redis_client=Redis(host=config.redis_host),
-    prefix="bot-cache"
-)
-
-@cache.cache(ttl=10)
-def get_moderators():
-    with create_connection() as conn, conn.cursor(dictionary=True) as cursor:
-        cursor.execute("select * from moderators")
-        data = cursor.fetchall()
-        return [Moderator.parse_obj(d) for d in data]
+with create_connection() as conn, conn.cursor(dictionary=True) as cursor:
+    cursor.execute("select * from moderators")
+    _data = cursor.fetchall()
+    moderators: list[Moderator] = [Moderator.parse_obj(d) for d in _data]
