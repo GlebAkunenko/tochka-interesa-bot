@@ -1,17 +1,25 @@
 from fastapi import FastAPI
-from pyteledantic.models import Bot, Update, MessageToSend
+from pyteledantic.models import Bot, Update
 
 import pyteledantic.methods as tg
 import src.config as config
 
-app = FastAPI()
+from src.handlers.base import handlers
+
+app = FastAPI(
+    title="Telegram Bot (public)",
+    description="""
+    A public server for processing requests from the WWW via webhooks
+    """
+)
 bot = Bot(token=config.token)
 
 
 @app.post("/send_message")
 def update_handler(update: Update):
-    tg.send_message(bot.token, MessageToSend(chat_id=update.message.chat.id, text=update.message.text))
-    return "OK"
+    for handler in handlers:
+        if handler.is_approach(update):
+            handler.func(update)
 
 
 @app.get("/info")
