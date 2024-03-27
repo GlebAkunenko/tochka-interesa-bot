@@ -1,32 +1,18 @@
 from pyteledantic.models import Update
 
 class Handler:
-    def __init__(self, func):
-        self.func = func
-
-    def is_approach(self, update: Update):
-        return True
+    def __init__(self):
+        self.funcs = []
 
 
-class Command(Handler):
-    def __init__(self, command, func):
-        super().__init__(func)
-        self.command = command
+    def command(self, command):
+        def decorator(func):
+            def wrapper(update: Update) -> bool:
+                if update.message and update.message.text and update.message.text.startswith(command):
+                    func(update.message)
+                    return True
+                return False
+            self.funcs.append(wrapper)
+            return wrapper
+        return decorator
 
-    def is_approach(self, update: Update):
-        if update.message:
-            if update.message.text:
-                return update.message.text.startswith(self.command)
-        return False
-
-
-handlers: list[Handler] = []
-
-
-def command_handler(command: str):
-    def decorator(func):
-        def wrapper(update: Update):
-            return func(update.message)
-        handlers.append(Command(command, wrapper))
-        return func
-    return decorator

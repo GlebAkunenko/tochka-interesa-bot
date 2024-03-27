@@ -1,12 +1,13 @@
 from pyteledantic.models import Message
 
-from src.handlers.base import command_handler
+from src.handlers.base import Handler
 from src.database import create_connection
 
 import datetime as dt
 
+handler = Handler()
 
-@command_handler("/subscribe")
+@handler.command("/subscribe")
 def subscribe(message: Message):
     with create_connection() as conn, conn.cursor() as cursor:
         cursor.execute(f"""
@@ -20,7 +21,7 @@ def subscribe(message: Message):
         conn.commit()
 
 
-@command_handler("/unsubscribe")
+@handler.command("/unsubscribe")
 def unsubscribe(message: Message):
     with create_connection() as conn, conn.cursor() as cursor:
         cursor.execute(f"delete from moderators where telegram_id = '{message.from_user.id}'")
