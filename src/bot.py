@@ -17,13 +17,13 @@ bot = Bot(config.token)
 
 from src.handlers.moderators import handler as moderator
 
-handlers = [] + moderator
+handlers = [] + moderator.funcs
 
 @app.post("/send_message")
 def update_handler(update: Update):
     for handler in handlers:
         if handler(update):
-            break
+            return
     if update.message:
         bot.send_message(update.message.from_user.id, "Неизвестная команда")
 
