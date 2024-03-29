@@ -15,7 +15,7 @@ async def notify_moderators(text: str):
             tasks = []
             for moderator in moderators:
                 message = MessageToSend(chat_id=moderator.telegram_id, text=text, parse_mode="MarkdownV2")
-                tasks.append(asyncio.create_task(session.post(url, params=message.dict(), response_model=Message)))
+                tasks.append(asyncio.create_task(session.post(url, params=message.dict())))
             await asyncio.gather(*tasks)
 
 
