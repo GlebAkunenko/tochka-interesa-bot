@@ -1,22 +1,13 @@
-from fastapi import Depends
 from fastapi.routing import APIRouter
-from pyteledantic.models import Bot, MessageToSend
 
 from src.model import Moderator
 
-import pyteledantic.methods as tg
-import src.config as config
+import src.utils as bot
 
 router = APIRouter(prefix="/notify")
-bot = Bot(token=config.token)
+
 
 @router.post("/server")
-def server_status(server: str, is_active: bool):
-    moderators: list[Moderator] = Moderator.select()
-    if moderators:
-        for moderator in moderators:
-            tg.send_message(bot.token, MessageToSend(
-                chat_id=moderator.telegram_id,
-                text=f"*{server}* {'запущен ✅' if is_active else 'остановлен ❌'}",
-                parse_mode="MarkdownV2"
-            ))
+async def server_status(server: str, is_active: bool):
+    text = f"{'✅' if is_active else '❌'} *{server}* {'запущен ✅' if is_active else 'остановлен ❌'}"
+    await bot.notify_moderators(text)

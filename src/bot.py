@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from pyteledantic.models import Update
+from pyteledantic.models import Update, MessageToSend
 
 import pyteledantic.methods as tg
 import src.config as config
-
-from src.utils import Bot
+import src.utils as bot
 
 app = FastAPI(
     title="Telegram Bot (public)",
@@ -12,12 +11,13 @@ app = FastAPI(
     A public server for processing requests from the WWW via webhooks
     """
 )
-bot = Bot(config.token)
 
 
 from src.handlers.moderators import handler as moderator
 
 handlers = [] + moderator.funcs
+
+
 
 @app.post("/send_message")
 def update_handler(update: Update):
@@ -32,14 +32,16 @@ def update_handler(update: Update):
 
 @app.get("/info")
 def get_info():
-    return tg.get_webhook_info(bot)
+    return tg.get_webhook_info(bot.token)
 
 
 @app.on_event("startup")
-def on_start():
-    tg.set_webhook(bot, config.webhook_url, config.ssl_certfile)
+async def on_start():
+    tg.set_webhook(bot.token, config.webhook_url, config.ssl_certfile)
+    await bot.notify_moderators("✅ Бот запущен ✅")
 
 
 @app.on_event("shutdown")
-def on_stop():
-    tg.delete_webhook(bot)
+async def on_stop():
+    tg.delete_webhook(bot.token)
+    await bot.notify_moderators("❌ Бот остановлен ❌")

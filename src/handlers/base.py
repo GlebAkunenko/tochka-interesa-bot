@@ -12,7 +12,7 @@ class Handler:
                     return func(update.message)
                 return
             self.funcs.append(wrapper)
-            return wrapper
+            return func
         return decorator
 
 
@@ -23,6 +23,6 @@ class Handler:
                     return func(update.callback_query)
                 return
             self.funcs.append(wrapper)
-            return wrapper
+            return func
         return decorator
 
