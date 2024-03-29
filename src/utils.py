@@ -15,7 +15,7 @@ async def notify_moderators(text: str):
             tasks = []
             for moderator in moderators:
                 message = MessageToSend(chat_id=moderator.telegram_id, text=text, parse_mode="MarkdownV2")
-                await session.post(url, params=message.dict())
+                await session.post(url, data=message.dict())
             # await asyncio.wait(tasks)
 
 
