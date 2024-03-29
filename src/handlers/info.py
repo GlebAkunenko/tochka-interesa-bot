@@ -10,7 +10,7 @@ import datetime as dt
 handler = Handler()
 
 
-@handler.command('/chechup')
+@handler.command('/checkup')
 @handler.command('Состояние серверов')
 def check(message: Message):
     user = message.from_user.id

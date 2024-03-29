@@ -14,8 +14,9 @@ app = FastAPI(
 
 
 from src.handlers.moderators import handler as moderator
+from src.handlers.info import handler as info
 
-handlers = [] + moderator.funcs
+handlers = moderator.funcs + info.funcs
 
 
 
